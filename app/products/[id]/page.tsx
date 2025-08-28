@@ -1,42 +1,42 @@
 // app/products/[id]/page.tsx
-import ProductDetail from "@/components/ui/product-detail";
 import { stripe } from "@/lib/stripe";
 import type Stripe from "stripe";
-import type { ProductLite } from "@/types/product";
 
-type Params = { params: { id: string } };
-
-// Type guard to verify an expanded Stripe price
+// narrow unknown -> Stripe.Price (no `any`)
 function isStripePrice(p: unknown): p is Stripe.Price {
+  if (typeof p !== "object" || p === null) return false;
+  const r = p as Record<string, unknown>;
   return (
-    !!p &&
-    typeof p === "object" &&
-    "id" in p &&
-    "currency" in p &&
-    "unit_amount" in p
+    typeof r.id === "string" &&
+    typeof r.currency === "string" &&
+    (typeof r.unit_amount === "number" || r.unit_amount === null)
   );
 }
 
-export default async function ProductPage({ params }: Params) {
-  const raw = await stripe.products.retrieve(params.id, {
+export default async function ProductPage({
+  params,
+}: {
+  params: Promise<{ id: string }>; // <-- inline type for Next 15
+}) {
+  const { id } = await params;
+
+  const product = await stripe.products.retrieve(id, {
     expand: ["default_price"],
   });
 
-  const price = isStripePrice(raw.default_price) ? raw.default_price : null;
+  const price = isStripePrice(product.default_price)
+    ? product.default_price
+    : null;
 
-  const product: ProductLite = {
-    id: raw.id,
-    name: raw.name ?? "",
-    description: raw.description ?? "",
-    images: Array.isArray(raw.images) ? raw.images : [],
-    default_price: price
-      ? {
-          id: price.id,
-          unit_amount: price.unit_amount ?? 0,
-          currency: price.currency,
-        }
-      : null,
-  };
+  const amountCents = price?.unit_amount ?? 0;
 
-  return <ProductDetail product={product} />;
+  return (
+    <div className="container mx-auto px-4 py-8">
+      <h1 className="text-3xl font-semibold mb-6">{product.name}</h1>
+      <p className="text-lg">
+        {price ? `$${(amountCents / 100).toFixed(2)}` : "No price available"}
+      </p>
+      {/* ...rest of your UI */}
+    </div>
+  );
 }
