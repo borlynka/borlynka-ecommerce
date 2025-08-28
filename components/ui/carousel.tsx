@@ -1,6 +1,6 @@
 "use client";
 
-import type Stripe from "stripe";
+import type Stripe from "stripe"; // <-- add this back (type-only)
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import { Card } from "./card"; // <-- same folder, so "./card"

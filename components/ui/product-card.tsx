@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import type Stripe from "stripe";
+import type Stripe from "stripe"; // <-- add this back (type-only)
 import {
   Card,
   CardHeader,

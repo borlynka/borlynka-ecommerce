@@ -2,7 +2,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import type Stripe from "stripe";
+import type Stripe from "stripe"; // <-- add this back (type-only)
 import ProductCard from "@/components/ui/product-card";
 
 interface Props {

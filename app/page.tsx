@@ -1,9 +1,7 @@
 // app/page.tsx
-
-"use client";
-
 import Link from "next/link";
 import Image from "next/image";
+import type Stripe from "stripe";
 import { stripe } from "@/lib/stripe";
 import { Button } from "@/components/ui/button";
 import { Carousel } from "@/components/ui/carousel"; // <-- path fixed
